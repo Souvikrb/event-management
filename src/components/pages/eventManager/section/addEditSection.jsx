@@ -4,23 +4,12 @@ import ApiPaths from "../../../../api/ApiPaths";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import useResponse from "../../../customHooks/useResponse";
 
-const AddEditSection = ({ profileId = null, profileData }) => {
-    const defaultFormValues = {
-        eventName: "",
-        eventHighlight: "",
-        dateTime: "",
-        country: "",
-        city: "",
-        location: "",
-        profileImage: "",
-        category: "",
-        status: "active",
-    };
+const AddEditSection = ({ profileId = null, profileData,formData,setFormData,validateForm,handleSubmit,errors}) => {
+
 
     const { postApiHandler, getApiHandler, putApiHandler } = useApiHandlers();
-    const [formData, setFormData] = useState(defaultFormValues);
+    
     const [profileImage, setProfileImage] = useState("");
-    const [errors, setErrors] = useState({});
     const [categories, setCategories] = useState([]);
     const [countries, setCountries] = useState([]);
     const [cities, setCities] = useState([]);
@@ -28,6 +17,15 @@ const AddEditSection = ({ profileId = null, profileData }) => {
     const { notify } = useResponse();
 
     const fileInputRef = useRef(null);
+
+    // Validate form
+    
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        fetchCategories();
+        fetchCountries();
+    }, []);
 
     // Handle input change
     const handleChange = (e) => {
@@ -40,35 +38,13 @@ const AddEditSection = ({ profileId = null, profileData }) => {
             fetchLocation(value); // Fetch locations based on selected city
         }
     };
-    
-
-    // Validate form
-    const validateForm = () => {
-        const errors = {};
-        if (!formData.eventName) errors.eventName = "Event Name is required";
-        if (!formData.eventHighlight) errors.eventHighlight = "Event Highlight is required";
-        if (!formData.dateTime) {
-            errors.dateTime = "Date & Time is required";
-        } else if (new Date(formData.dateTime) < new Date()) {
-            errors.dateTime = "Date & Time cannot be in the past";
-        }
-        setErrors(errors);
-        return Object.keys(errors).length === 0;
-    };
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        fetchCategories();
-        fetchCountries();
-    }, []);
 
     useEffect(() => {
         if (profileId != null) {
             fetchCity();
             fetchLocation();
-            setFormData(profileData);
         }
-    }, [profileData]);
+    }, []);
 
     const fetchCategories = async () => {
         const response = await getApiHandler(`${ApiPaths.master_list}/MASTER_CATEGORY`);
@@ -116,34 +92,14 @@ const AddEditSection = ({ profileId = null, profileData }) => {
         }
     };
 
-    // Handle form submission
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!validateForm()) {
-            return;
-        }
-        let response;
-        if (profileId) {
-            response = await putApiHandler(`${ApiPaths.event}/${profileId}`, formData);
-        } else {
-            response = await postApiHandler(ApiPaths.event, formData);
-        }
-
-        if (response.status === 200 || response.status === 201) {
-            navigate('/event/add')
-            notify({ title: "Success!", text: response.data, icon: "success" });
-        } else {
-            notify({ title: "Error!", text: response.data, icon: "error" });
-        }
-    };
-
+    
     return (
-        <div className="tab-pane fade show active">
+       
             <form onSubmit={handleSubmit}>
                 {/* Profile Image */}
                 <div className="row mb-3">
                     <label htmlFor="profileImage" className="col-md-4 col-lg-3 col-form-label">
-                        Profile Image
+                        Event Image
                     </label>
                     <div className="col-md-8 col-lg-9">
                         {profileImage ? <img style={{ width: "110px" }} src={profileImage} alt="Profile" />
@@ -189,42 +145,71 @@ const AddEditSection = ({ profileId = null, profileData }) => {
                         {errors.eventName && <div className="invalid-feedback">{errors.eventName}</div>}
                     </div>
                 </div>
-
-                {/* Event Highlight */}
                 <div className="row mb-3">
-                    <label htmlFor="eventHighlight" className="col-md-4 col-lg-3 col-form-label">
-                        Event Highlight
-                    </label>
-                    <div className="col-md-8 col-lg-9">
-                        <textarea
-                            name="eventHighlight"
-                            className={`form-control ${errors.eventHighlight ? "is-invalid" : ""}`}
-                            id="eventHighlight"
-                            style={{ height: 100 }}
-                            value={formData.eventHighlight}
-                            onChange={handleChange}
-                        />
-                        {errors.eventHighlight && <div className="invalid-feedback">{errors.eventHighlight}</div>}
-                    </div>
-                </div>
-
-                {/* Date & Time */}
-                <div className="row mb-3">
-                    <label htmlFor="dateTime" className="col-md-4 col-lg-3 col-form-label">
-                        Date & Time
+                    <label htmlFor="providerName" className="col-md-4 col-lg-3 col-form-label">
+                        Provider Name
                     </label>
                     <div className="col-md-8 col-lg-9">
                         <input
-                            name="dateTime"
-                            type="datetime-local"
-                            className={`form-control ${errors.dateTime ? "is-invalid" : ""}`}
-                            id="dateTime"
-                            value={formData.dateTime}
+                            name="providerName"
+                            type="text"
+                            className={`form-control ${errors.providerName ? "is-invalid" : ""}`}
+                            id="providerName"
+                            value={formData.providerName}
                             onChange={handleChange}
                         />
-                        {errors.dateTime && <div className="invalid-feedback">{errors.dateTime}</div>}
+                        {errors.providerName && <div className="invalid-feedback">{errors.providerName}</div>}
                     </div>
                 </div>
+                <div className="row mb-3">
+                    <label htmlFor="phone" className="col-md-4 col-lg-3 col-form-label">
+                        Phone Number
+                    </label>
+                    <div className="col-md-8 col-lg-9">
+                        <input
+                            name="phone"
+                            type="text"
+                            className={`form-control ${errors.phone ? "is-invalid" : ""}`}
+                            id="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                        />
+                        {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
+                    </div>
+                </div>       
+                {/* Event Description */}
+                <div className="row mb-3">
+                    <label htmlFor="eventDescription" className="col-md-4 col-lg-3 col-form-label">
+                        Event Details
+                    </label>
+                    <div className="col-md-8 col-lg-9">
+                        <textarea
+                            name="eventDescription"
+                            className={`form-control ${errors.eventDescription ? "is-invalid" : ""}`}
+                            id="eventDescription"
+                            style={{ height: 100 }}
+                            value={formData.eventDescription}
+                            onChange={handleChange}
+                        />
+                        {errors.eventDescription && <div className="invalid-feedback">{errors.eventDescription}</div>}
+                    </div>
+                </div>        
+                <div className="row mb-3">
+                    <label htmlFor="price" className="col-md-4 col-lg-3 col-form-label">
+                       Ticket Price
+                    </label>
+                    <div className="col-md-8 col-lg-9">
+                        <input
+                            name="price"
+                            type="text"
+                            className={`form-control ${errors.price ? "is-invalid" : ""}`}
+                            id="price"
+                            value={formData.price}
+                            onChange={handleChange}
+                        />
+                        {errors.price && <div className="invalid-feedback">{errors.phone}</div>}
+                    </div>
+                </div>       
 
                 {/* Category */}
                 <div className="row mb-3">
@@ -328,7 +313,6 @@ const AddEditSection = ({ profileId = null, profileData }) => {
                     </button>
                 </div>
             </form>
-        </div>
     );
 };
 

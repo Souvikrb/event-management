@@ -23,6 +23,14 @@ const Sidebar = () => {
             ]
         },
         { 
+            label: 'Advertisement Manager', 
+            permission: 'advertisement_manager', 
+            icon: 'bi bi-menu-button-wide', 
+            children: [
+                { path: '/advertisement', label: 'Advertisement', permission: 'advertisement' }
+            ]
+        },
+        { 
             label: 'Configuration', 
             permission: 'configaration', 
             icon: 'bi bi-menu-button-wide', 

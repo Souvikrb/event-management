@@ -93,7 +93,7 @@ export default function EventList() {
                                                     </td>
                                                     <td>{new Date(list.dateTime).toLocaleString()}</td>
                                                     <td>
-                                                        <Link to={`/event/update/${list._id}`}>
+                                                        <Link to={`/event/add/${list._id}`}>
                                                             <i className="bx bxs-pencil text-primary" style={{ cursor: "pointer" }}></i>
                                                         </Link>&nbsp;
                                                         <i className="bx bx-trash text-danger" style={{ cursor: "pointer" }} onClick={() => handleDelete(list._id)}></i>&nbsp;

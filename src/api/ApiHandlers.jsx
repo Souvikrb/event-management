@@ -11,7 +11,7 @@ const useApiHandlers = () => {
       const response = await axios.post(path, postdata, {
         headers: { "Accept": "Application/json", "Content-Type": "multipart/form-data","Authorization": `Bearer ${token}` },
       });
-      return { data:response.data.message, status: response.status ? response.status : 500 };
+      return { data:response.data.message, status: response.status ? response.status : 500,alldata:response.data };
     } catch (error) {
       const data =
         error.response && error.response.data
@@ -80,7 +80,7 @@ const putApiHandler = useCallback(async (path, putdata) => {
               "Authorization": `Bearer ${token}`,
           },
       });
-      return { data: response.data.message, status: response.status ? response.status : 500 };
+      return { data: response.data.message, status: response.status ? response.status : 500,alldata:response.data };
   } catch (error) {
       const data =
           error.response && error.response.data

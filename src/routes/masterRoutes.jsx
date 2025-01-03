@@ -17,6 +17,8 @@ import ProtectedRoute from "../app/protectedRoute";
 import EventAdd from "../components/pages/eventManager/eventAdd";
 import EventManager from "../components/pages/eventManager/eventManager";
 import EventEdit from "../components/pages/eventManager/eventEdit";
+import AdvertisementAdd from "../components/pages/advertisementManager/advertisementAdd";
+import Advertisement from "../components/pages/advertisementManager/advertisement";
 
 export default function MasterRoutes(){
     return(
@@ -47,7 +49,9 @@ export default function MasterRoutes(){
 
             <Route path="/event/add/:id?" element={<EventAdd />} />
             <Route path="/event/" element={<EventManager />} />
-            <Route path="/event/update/:id" element={<EventEdit />} />
+            <Route path="/event/update/:id?" element={<EventEdit />} />
+            <Route path="/advertisement/add/:id?" element={<AdvertisementAdd />} />
+            <Route path="/advertisement/" element={<Advertisement />} />
         </Routes>
     );
 }

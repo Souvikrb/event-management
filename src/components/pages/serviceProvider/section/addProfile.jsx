@@ -8,6 +8,7 @@ const AddProfile = ({profileId = null, profileData}) => {
         fullName: "",
         phone: "",
         email: "",
+        password:"",
         about: "",
         country: "",
         city: "",
@@ -45,6 +46,7 @@ const AddProfile = ({profileId = null, profileData}) => {
         const errors = {};
         if (!formData.fullName.trim()) errors.fullName = "Full Name is required";
         if (!formData.phone) errors.phone = "Phone is required";
+        //if (!formData.password) errors.password = "Password is required";
         if (!formData.email.trim()) {
             errors.email = "Email is required";
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -223,6 +225,22 @@ const AddProfile = ({profileId = null, profileData}) => {
                             {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                         </div>
                     </div>
+                    {/* <div className="row mb-3">
+                        <label htmlFor="Password" className="col-md-4 col-lg-3 col-form-label">
+                            Password
+                        </label>
+                        <div className="col-md-8 col-lg-9">
+                            <input
+                                name="password"
+                                type="password"
+                                className={`form-control ${errors.password ? "is-invalid" : ""}`}
+                                id="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                            />
+                            {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+                        </div>
+                    </div> */}
                     <div className="row mb-3">
                         <label htmlFor="about" className="col-md-4 col-lg-3 col-form-label">
                             About
