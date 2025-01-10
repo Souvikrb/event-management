@@ -18,6 +18,8 @@ export const requestForToken = async () => {
     const currentToken = await getToken(messaging, { vapidKey: 'BGRf5Xpw_3_OtQKoGoBarU6ekcbVGEsgUHFG0JzNf-rk9F70TqT20O79L2T_fiuHsOkdKh_2pGqw_iDGwHxzf24' });
     if (currentToken) {
       console.log('Token:', currentToken);
+      sessionStorage.setItem('notificationToken',currentToken);
+
       return currentToken;
     } else {
       console.log('No registration token available.');
@@ -25,6 +27,7 @@ export const requestForToken = async () => {
   } catch (error) {
     console.error('Error getting token:', error);
   }
+  
 };
 
 export const onMessageListener = () =>

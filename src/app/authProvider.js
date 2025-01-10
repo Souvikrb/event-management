@@ -10,16 +10,16 @@ export const AuthProvider = ({ children }) => {
         user: [
             'dashboard', 'service_provider', 'configuration', 'location', 'serviceprovider', 
             'event_manager', 'event', 'country', 'advertisement', 'advertisement_manager', 
-            'user_manager', 'usermanager', 'category', 'city'
+            'user_manager', 'usermanager', 'category', 'city','notification'
         ],
         admin: [
             'dashboard', 'service_provider', 'configuration', 'location', 'serviceprovider', 
             'event_manager', 'event', 'country', 'advertisement', 'advertisement_manager', 
-            'user_manager', 'usermanager', 'category', 'city'
+            'user_manager', 'usermanager', 'category', 'city','notification'
         ],
         serviceprovider: [
             'dashboard', 'configuration', 'location', 
-            'event_manager', 'event', 'country', 'advertisement', 'advertisement_manager','category', 'city'
+            'event_manager', 'event', 'country', 'advertisement', 'advertisement_manager','category', 'city','notification'
         ]
     };
     const role = 'admin';

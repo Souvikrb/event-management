@@ -31,6 +31,14 @@ const Sidebar = () => {
             ]
         },
         { 
+            label: 'Notification Manager', 
+            permission: 'notification', 
+            icon: 'bi bi-menu-button-wide', 
+            children: [
+                { path: '/notification', label: 'Notification', permission: 'notification' }
+            ]
+        },
+        { 
             label: 'User Manager', 
             permission: 'user_manager', 
             icon: 'bi bi-menu-button-wide', 

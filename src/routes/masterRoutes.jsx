@@ -21,6 +21,8 @@ import Advertisement from "../components/pages/advertisementManager/advertisemen
 import UserManager from "../components/pages/userManager/userManager";
 import UserManagerAdd from "../components/pages/userManager/userManagerAdd";
 import ProtectedRoute from "../app/protectedRoute";
+import Notification from "../components/pages/notificationManager/notification";
+import NotificationAdd from "../components/pages/notificationManager/notificationAdd";
 
 export default function MasterRoutes() {
     return (
@@ -214,6 +216,34 @@ export default function MasterRoutes() {
                 }
             />
 
+            {/* Notification Management */}
+            <Route
+                path="/notification"
+                element={
+                    <ProtectedRoute permission="notification">
+                        <Notification />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/notification/add/"
+                element={
+                    <ProtectedRoute permission="notification">
+                        <NotificationAdd />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/notification/update/:id?"
+                element={
+                    <ProtectedRoute permission="notification">
+                        <NotificationAdd />
+                    </ProtectedRoute>
+                }
+            />
+
         </Routes>
+
+            
     );
 }

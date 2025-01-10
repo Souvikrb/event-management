@@ -28,4 +28,7 @@ export default class ApiPaths {
     static users            = this.site_url+"/api/users";
     static role             = this.site_url+"/api/master/role";
     static userApprove      = this.site_url+"/api/users/approve";
+
+    static notification     = this.site_url+"/api/notification";
+    static pushNotification = this.site_url+"/sendNotification";
 }
