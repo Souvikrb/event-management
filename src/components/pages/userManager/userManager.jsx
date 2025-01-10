@@ -1,39 +1,37 @@
 
-import { Link } from "react-router-dom";
-import useApiHandlers from "../../../api/ApiHandlers";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import ApiPaths from "../../../api/ApiPaths";
+import useApiHandlers from "../../../api/ApiHandlers";
 import useResponse from "../../customHooks/useResponse";
-export default function Category() {
-    const { getApiHandler,deleteApiHandler } = useApiHandlers();
+export default function UserManager() {
+    const { getApiHandler, deleteApiHandler, putApiHandler } = useApiHandlers();
+    const { notify } = useResponse();
     const [datalist, setDatalist] = useState([]);
-    const { notify } = useResponse()
-    // Fetch data when the component mounts
     useEffect(() => {
-        
-        fetchData(); 
+        fetchData();
     }, []);
     const fetchData = async () => {
-        const response = await getApiHandler(`${ApiPaths.master_list}/MASTER_CATEGORY`);
+        const response = await getApiHandler(`${ApiPaths.users}`);
         console.log(response);
         if (response.status === 200) {
             setDatalist(response.data);
-        }else{
-            notify({title:"Error!",text:response.data,icon:"error"})
+        } else {
+            notify({ title: "Error!", text: response.data, icon: "error" })
         }
     };
     const handleDelete = async (id) => {
         if (window.confirm("Are you sure you want to delete this item?")) {
             try {
                 // Call your API to delete the item
-                const response = await deleteApiHandler(`${ApiPaths.master_delete}/${id}`);
+                const response = await deleteApiHandler(`${ApiPaths.users}/${id}`);
 
                 if (response.status === 200) {
                     // Update the datalist by filtering out the deleted item
                     setDatalist((prevDatalist) => prevDatalist.filter(item => item._id !== id));
-                    notify({title:"Success!",text:response.data,icon:"success"});
+                    notify({ title: "Success!", text: response.data, icon: "success" });
                 } else {
-                    notify({title:"Error!",text:response.data,icon:"error"});
+                    notify({ title: "Error!", text: response.data, icon: "error" });
                 }
             } catch (error) {
                 console.error("Error deleting item:", error);
@@ -41,17 +39,28 @@ export default function Category() {
             }
         }
     };
+    const approveHandler = async (id, currentStatus) => {
+        const updateStatus = (currentStatus == 'active') ? 'inactive' : 'active';
+        const data = { status: updateStatus }
+        const response = await putApiHandler(`${ApiPaths.userApprove}/${id}`, data);
+        if (response.status == 200) {
+            fetchData();
+            notify({ title: "Success!", text: response.data, icon: "success" });
+        } else {
+            notify({ title: "Error!", text: response.data, icon: "error" });
+        }
+    };
     return (
         <>
             <main id="main" className="main">
                 <div className="pagetitle">
-                    <h1>Category List</h1>
+                    <h1>User List</h1>
                     <nav>
                         <ol className="breadcrumb">
                             <li className="breadcrumb-item">
                                 <Link to="/">Home</Link>
                             </li>
-                            <li className="breadcrumb-item active">Category List</li>
+                            <li className="breadcrumb-item active">User List</li>
                         </ol>
                     </nav>
                 </div>
@@ -62,7 +71,7 @@ export default function Category() {
                             <div className="card">
                                 <div className="card-body">
                                     <h5 className="card-title text-right">
-                                        <Link to="/category/add" className="btn btn-primary btn-sm">
+                                        <Link to="/user/add" className="btn btn-primary btn-sm">
                                             Add New
                                         </Link></h5>
                                     {/* Horizontal Form */}
@@ -70,20 +79,30 @@ export default function Category() {
                                         <thead>
                                             <tr>
                                                 <th scope="col">#</th>
-                                                <th scope="col">Category</th>
-                                                <th scope="col">Parent Category</th>
+                                                <th scope="col">Name</th>
+                                                <th scope="col">Phone</th>
+                                                <th scope="col">Email</th>
+                                                <th scope="col">Designation</th>
+                                                <th scope="col">Role</th>
+                                                <th scope="col">Status</th>
                                                 <th scope="col">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            
-                                        {datalist && datalist.length > 0 ? datalist.map((list, index) => (
+                                            {datalist && datalist.length > 0 ? datalist.map((list, index) => (
                                                 <tr key={index}>
                                                     <th scope="row">{index + 1}</th>
-                                                    <td>{list.DESC1}</td>
-                                                    <td>{list.parentName || '---'}</td>
+                                                    <td>{list.profileImage && (<img alt="Profile" class="rounded-circle" src={`${ApiPaths.site_url}${list.profileImage}`} style={{width: "40px"}}></img>)}{list.name}</td>
+                                                    <td>{list.phone}</td>
+                                                    <td>{list.email}</td>
+                                                    <td>{list.designation}</td>
+                                                    <td>{list.role}</td>
+                                                    <td><div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id={`flexSwitchCheckChecked${index}`} onChange={e => approveHandler(list._id, list.status)} checked={list.status == 'active' && 'checked'} />
+                                                    </div>
+                                                    </td>
                                                     <td>
-                                                        <Link to={`/category/add/${list._id}`}><i className="bx bxs-pencil text-primary" style={{ cursor: "pointer" }}></i></Link>&nbsp;
+                                                        <Link to={`/user/update/${list._id}`}><i className="bx bxs-pencil text-primary" style={{ cursor: "pointer" }}></i></Link>&nbsp;
                                                         <i className="bx bx-trash text-danger" style={{ cursor: "pointer" }} onClick={() => handleDelete(list._id)}></i>&nbsp;
                                                     </td>
                                                 </tr>
@@ -92,7 +111,6 @@ export default function Category() {
                                                     <td colSpan="4" className="text-center">No data found</td>
                                                 </tr>
                                             )}
-
 
                                         </tbody>
                                     </table>

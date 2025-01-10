@@ -36,7 +36,7 @@ export default function Advertisement() {
     const handleDelete = async (id) => {
         if (window.confirm("Are you sure you want to delete this item?")) {
             try {
-                const response = await deleteApiHandler(`${ApiPaths.master_delete}/${id}`);
+                const response = await deleteApiHandler(`${ApiPaths.advertisement}/${id}`);
                 if (response.status === 200) {
                     setDatalist((prevDatalist) => prevDatalist.filter((item) => item._id !== id));
                     notify({ title: "Success!", text: response.data, icon: "success" });
@@ -128,7 +128,7 @@ export default function Advertisement() {
                                                         <td>{list.fdate || "---"}</td>
                                                         <td>{list.tdate || "---"}</td>
                                                         <td>
-                                                            <Link to={`/location/add/${list._id}`}>
+                                                            <Link to={`/advertisement/update/${list._id}`}>
                                                                 <i
                                                                     className="bx bxs-pencil text-primary"
                                                                     style={{ cursor: "pointer" }}

@@ -24,4 +24,8 @@ export default class ApiPaths {
     static event            = this.site_url+"/api/event";
 
     static advertisement    = this.site_url+"/api/advertisement";
+
+    static users            = this.site_url+"/api/users";
+    static role             = this.site_url+"/api/master/role";
+    static userApprove      = this.site_url+"/api/users/approve";
 }

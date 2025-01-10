@@ -32,13 +32,14 @@ export default function AdvertisementAdd() {
     }
     // Fetch location data for editing
     const fetchUpdateData = async (id) => {
-        const response = await getApiHandler(`${ApiPaths.master_singledata}/${id}`);
+        const response = await getApiHandler(`${ApiPaths.advertisement}/${id}`);
         if (response.status == 200) {
             setFormdata((prvdata) => ({
                 ...prvdata,
-                parent_id: response.data.parent_id,
-                DESC1: response.data.DESC1,
-                DESC2: response.data.DESC2,
+                adsname: response.data.adsname,
+                fdate: response.data.fdate,
+                tdate: response.data.tdate,
+                adsImg: response.data.adsImg,
             }));
         }
     };

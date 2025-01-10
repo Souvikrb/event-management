@@ -4,9 +4,12 @@ import Header from "./components/common/header";
 import Sidebar from "./components/common/sidebar";
 import Login from "./components/pages/login";
 import Registration from "./components/pages/registration";
-
+import { useEffect, useState } from "react";
+import useFirebaseNotifications from "./firebaseNotification/useFirebaseNotifications";
 function App() {
-  const AppLayout = () => {
+
+  const AppLayout = () => { 
+    useFirebaseNotifications();
     const location = useLocation();
 
     // Define routes where Header and Sidebar should not be shown
@@ -21,6 +24,7 @@ function App() {
         {!isNoLayoutRoute && <Sidebar />}
         {/* Main application routes */}
         <MasterRoutes />
+        
       </>
     );
   };

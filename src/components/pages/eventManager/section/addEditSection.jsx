@@ -11,6 +11,7 @@ const AddEditSection = ({ profileId = null, profileData,formData,setFormData,val
     
     const [profileImage, setProfileImage] = useState("");
     const [categories, setCategories] = useState([]);
+    const [provider, setProvider] = useState([]);
     const [countries, setCountries] = useState([]);
     const [cities, setCities] = useState([]);
     const [locations, setLocations] = useState([]);
@@ -25,6 +26,7 @@ const AddEditSection = ({ profileId = null, profileData,formData,setFormData,val
     useEffect(() => {
         fetchCategories();
         fetchCountries();
+        fetchProvider();
     }, []);
 
     // Handle input change
@@ -50,6 +52,13 @@ const AddEditSection = ({ profileId = null, profileData,formData,setFormData,val
         const response = await getApiHandler(`${ApiPaths.master_list}/MASTER_CATEGORY`);
         if (response.status === 200) {
             setCategories(response.data);
+        }
+    };
+
+    const fetchProvider = async () => {
+        const response = await getApiHandler(`${ApiPaths.serviceprovider}`);
+        if (response.status === 200) {
+            setProvider(response.data);
         }
     };
 
@@ -150,14 +159,19 @@ const AddEditSection = ({ profileId = null, profileData,formData,setFormData,val
                         Provider Name
                     </label>
                     <div className="col-md-8 col-lg-9">
-                        <input
+                    <select
                             name="providerName"
-                            type="text"
-                            className={`form-control ${errors.providerName ? "is-invalid" : ""}`}
-                            id="providerName"
+                            className={`form-control select2 ${errors.providerName ? "is-invalid" : ""}`}
                             value={formData.providerName}
                             onChange={handleChange}
-                        />
+                        >
+                            <option value="">Select provider</option>
+                            {provider.map((p) => (
+                                <option key={p._id} value={p._id}>
+                                    {p.fullName}
+                                </option>
+                            ))}
+                        </select>
                         {errors.providerName && <div className="invalid-feedback">{errors.providerName}</div>}
                     </div>
                 </div>

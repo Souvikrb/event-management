@@ -31,8 +31,16 @@ const Sidebar = () => {
             ]
         },
         { 
+            label: 'User Manager', 
+            permission: 'user_manager', 
+            icon: 'bi bi-menu-button-wide', 
+            children: [
+                { path: '/users', label: 'Users', permission: 'usermanager' }
+            ]
+        },
+        { 
             label: 'Configuration', 
-            permission: 'configaration', 
+            permission: 'configuration', 
             icon: 'bi bi-menu-button-wide', 
             children: [
                 { path: '/category', label: 'Category Master', permission: 'category' },
@@ -44,7 +52,6 @@ const Sidebar = () => {
     ];
 
     const hasPermission = (permission) => permissions.includes(permission);
-    console.log(permissions);
     return (
         <aside id="sidebar" className="sidebar">
             <ul className="sidebar-nav" id="sidebar-nav">
