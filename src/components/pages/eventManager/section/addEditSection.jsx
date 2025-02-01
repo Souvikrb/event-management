@@ -231,6 +231,7 @@ const AddEditSection = ({ profileId = null, profileData,formData,setFormData,val
                         Category
                     </label>
                     <div className="col-md-8 col-lg-9">
+                        
                         <select
                             name="category"
                             className={`form-control select2 ${errors.category ? "is-invalid" : ""}`}
@@ -238,7 +239,7 @@ const AddEditSection = ({ profileId = null, profileData,formData,setFormData,val
                             onChange={handleChange}
                         >
                             <option value="">Select category</option>
-                            {categories.map((category) => (
+                            { categories.map((category) => (
                                 <option key={category._id} value={category._id}>
                                     {category.DESC1}
                                 </option>

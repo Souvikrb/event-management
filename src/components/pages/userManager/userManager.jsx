@@ -8,6 +8,24 @@ export default function UserManager() {
     const { getApiHandler, deleteApiHandler, putApiHandler } = useApiHandlers();
     const { notify } = useResponse();
     const [datalist, setDatalist] = useState([]);
+
+    const [search, setSearch] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const rowsPerPage = 5;
+    // Filter data based on search input
+    const filteredData = datalist.filter((row) =>
+        Object.values(row).some((value) =>
+            String(value).toLowerCase().includes(search.toLowerCase())
+        )
+    );
+    const indexOfLastRow = currentPage * rowsPerPage;
+    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+    const currentRows = filteredData.slice(indexOfFirstRow, indexOfLastRow);
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
     useEffect(() => {
         fetchData();
     }, []);
@@ -74,8 +92,14 @@ export default function UserManager() {
                                         <Link to="/user/add" className="btn btn-primary btn-sm">
                                             Add New
                                         </Link></h5>
-                                    {/* Horizontal Form */}
-                                    <table className="table">
+                                    <input
+                                        type="text"
+                                        placeholder="Search..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        style={{ marginBottom: "10px", padding: "5px", width: "200px" }}
+                                    />
+                                    <table className="table datatable">
                                         <thead>
                                             <tr>
                                                 <th scope="col">#</th>
@@ -89,24 +113,26 @@ export default function UserManager() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {datalist && datalist.length > 0 ? datalist.map((list, index) => (
-                                                <tr key={index}>
-                                                    <th scope="row">{index + 1}</th>
-                                                    <td>{list.profileImage && (<img alt="Profile" class="rounded-circle" src={`${ApiPaths.site_url}${list.profileImage}`} style={{width: "40px"}}></img>)}{list.name}</td>
-                                                    <td>{list.phone}</td>
-                                                    <td>{list.email}</td>
-                                                    <td>{list.designation}</td>
-                                                    <td>{list.role}</td>
-                                                    <td><div class="form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" id={`flexSwitchCheckChecked${index}`} onChange={e => approveHandler(list._id, list.status)} checked={list.status == 'active' && 'checked'} />
-                                                    </div>
-                                                    </td>
-                                                    <td>
-                                                        <Link to={`/user/update/${list._id}`}><i className="bx bxs-pencil text-primary" style={{ cursor: "pointer" }}></i></Link>&nbsp;
-                                                        <i className="bx bx-trash text-danger" style={{ cursor: "pointer" }} onClick={() => handleDelete(list._id)}></i>&nbsp;
-                                                    </td>
-                                                </tr>
-                                            )) : (
+                                            {currentRows.length > 0 ? (
+                                                currentRows.map((list, index) => (
+                                                    <tr key={index}>
+                                                        <th scope="row">{index + 1}</th>
+                                                        <td>{list.name}</td>
+                                                        <td>{list.phone}</td>
+                                                        <td>{list.email}</td>
+                                                        <td>{list.designation}</td>
+                                                        <td>{list.role}</td>
+                                                        <td><div class="form-check form-switch">
+                                                            <input class="form-check-input" type="checkbox" id={`flexSwitchCheckChecked${index}`} onChange={e => approveHandler(list._id, list.status)} checked={list.status == 'active' && 'checked'} />
+                                                        </div>
+                                                        </td>
+                                                        <td>
+                                                            <Link to={`/user/update/${list._id}`}><i className="bx bxs-pencil text-primary" style={{ cursor: "pointer" }}></i></Link>&nbsp;
+                                                            <i className="bx bx-trash text-danger" style={{ cursor: "pointer" }} onClick={() => handleDelete(list._id)}></i>&nbsp;
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            ) : (
                                                 <tr>
                                                     <td colSpan="4" className="text-center">No data found</td>
                                                 </tr>
@@ -115,6 +141,24 @@ export default function UserManager() {
                                         </tbody>
                                     </table>
                                     {/* End Horizontal Form */}
+                                    <div style={{ marginTop: "10px" }}>
+                                        {Array.from({ length: totalPages }, (_, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => handlePageChange(index + 1)}
+                                                style={{
+                                                    margin: "0 5px",
+                                                    padding: "5px 10px",
+                                                    backgroundColor: currentPage === index + 1 ? "#007bff" : "#fff",
+                                                    color: currentPage === index + 1 ? "#fff" : "#000",
+                                                    border: "1px solid #007bff",
+                                                    cursor: "pointer",
+                                                }}
+                                            >
+                                                {index + 1}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -5,10 +5,24 @@ import useApiHandlers from "../../../api/ApiHandlers";
 import useResponse from "../../customHooks/useResponse";
 
 export default function EventList() {
-    const { getApiHandler, deleteApiHandler } = useApiHandlers();
+    const { getApiHandler, deleteApiHandler,putApiHandler } = useApiHandlers();
     const { notify } = useResponse();
     const [datalist, setDatalist] = useState([]);
-
+    const [currentPage, setCurrentPage] = useState(1);
+    const [search, setSearch] = useState('');
+    const rowsPerPage = 5;
+    const filteredData = datalist.filter((row) =>
+        Object.values(row).some((value) =>
+            String(value).toLowerCase().includes(search.toLowerCase())
+        )
+    );
+    const indexOfLastRow = currentPage * rowsPerPage;
+    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+    const currentRow = filteredData.slice(indexOfFirstRow, indexOfLastRow);
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
     useEffect(() => {
         fetchData();
     }, []);
@@ -39,6 +53,30 @@ export default function EventList() {
         }
     };
 
+    const approveSpecialistHandler = async (id, currentStatus) => {
+        const updateStatus = (currentStatus == 'active') ? 'inactive' : 'active';
+        const data = { status: updateStatus }
+        const response = await putApiHandler(`${ApiPaths.eventSpecialist}/${id}`, data);
+        if (response.status == 200) {
+            fetchData();
+            notify({ title: "Success!", text: response.data, icon: "success" });
+        } else {
+            notify({ title: "Error!", text: response.data, icon: "error" });
+        }
+    };
+
+    const approveHandler = async (id, currentStatus) => {
+        const updateStatus = (currentStatus == 'active') ? 'inactive' : 'active';
+        const data = { status: updateStatus }
+        const response = await putApiHandler(`${ApiPaths.eventApprove}/${id}`, data);
+        if (response.status == 200) {
+            fetchData();
+            notify({ title: "Success!", text: response.data, icon: "success" });
+        } else {
+            notify({ title: "Error!", text: response.data, icon: "error" });
+        }
+    };
+
     return (
         <>
             <main id="main" className="main">
@@ -64,6 +102,13 @@ export default function EventList() {
                                             Add New Event
                                         </Link>
                                     </h5>
+                                    <input
+                                        type="text"
+                                        placeholder="Search..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        style={{ marginBottom: "10px", padding: "5px", width: "200px" }}
+                                    />
                                     {/* Horizontal Form */}
                                     <table className="table">
                                         <thead>
@@ -72,11 +117,13 @@ export default function EventList() {
                                                 <th scope="col">Event Name</th>
                                                 <th scope="col">Image</th>
                                                 <th scope="col">Date</th>
+                                                <th scope="col">Is Specialist</th>
+                                                <th scope="col">Status</th>
                                                 <th scope="col">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {datalist && datalist.length > 0 ? datalist.map((list, index) => (
+                                            {currentRow && currentRow.length > 0 ? currentRow.map((list, index) => (
                                                 <tr key={index}>
                                                     <th scope="row">{index + 1}</th>
                                                     <td>{list.eventName}</td>
@@ -91,7 +138,20 @@ export default function EventList() {
                                                             "No Image"
                                                         )}
                                                     </td>
-                                                    <td>{new Date(list.dateTime).toLocaleString()}</td>
+                                                    <td>{list.dateTime && list.dateTime.length > 0 ? (
+                                                        <p>{list.dateTime[0].date}</p>
+                                                    ) : (
+                                                        <p>No date available</p>
+                                                    )}</td>
+                                                    <td><div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id={`flexSwitchCheckChecked${index}`} onChange={e => approveSpecialistHandler(list._id, list.isSpecialist)} checked={list.isSpecialist == 'active' && 'checked'} />
+                                                    </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id={`approveSwitchCheckChecked${index}`} onChange={e => approveHandler(list._id, list.status)} checked={list.status == 'active' && 'checked'} />
+                                                        </div>
+                                                    </td>
                                                     <td>
                                                         <Link to={`/event/add/${list._id}`}>
                                                             <i className="bx bxs-pencil text-primary" style={{ cursor: "pointer" }}></i>
@@ -106,6 +166,24 @@ export default function EventList() {
                                             )}
                                         </tbody>
                                     </table>
+                                    <div style={{ marginTop: "10px" }}>
+                                        {Array.from({ length: totalPages }, (_, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => handlePageChange(index + 1)}
+                                                style={{
+                                                    margin: "0 5px",
+                                                    padding: "5px 10px",
+                                                    backgroundColor: currentPage === index + 1 ? "#007bff" : "#fff",
+                                                    color: currentPage === index + 1 ? "#fff" : "#000",
+                                                    border: "1px solid #007bff",
+                                                    cursor: "pointer",
+                                                }}
+                                            >
+                                                {index + 1}
+                                            </button>
+                                        ))}
+                                    </div>
                                     {/* End Horizontal Form */}
                                 </div>
                             </div>

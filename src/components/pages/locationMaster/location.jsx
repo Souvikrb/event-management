@@ -7,32 +7,27 @@ import useResponse from "../../customHooks/useResponse";
 export default function Location() {
     const { getApiHandler, deleteApiHandler } = useApiHandlers();
     const [datalist, setDatalist] = useState([]);
-    const [filteredData, setFilteredData] = useState([]);
-    const [searchTerm, setSearchTerm] = useState(""); // Search term state
-    const [currentPage, setCurrentPage] = useState(1); // Current page
-    const [itemsPerPage] = useState(10); // Items per page
     const { id } = useParams();
     const { notify } = useResponse();
     const dataId = id || "";
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [loading, setLoading] = useState(false);
+    useEffect(() => { fetchData(currentPage); }, [currentPage]);
 
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    useEffect(() => {
-        handleSearch();
-    }, [searchTerm, datalist]);
-
-    const fetchData = async () => {
-        const response = await getApiHandler(`${ApiPaths.master_list}/MASTER_LOCATION`);
+    const fetchData = async (page) => {
+        const response = await getApiHandler(`${ApiPaths.master_listwithpagination}/MASTER_LOCATION?page=${page}&limit=3`);
         if (response.status === 200) {
-            setDatalist(response.data);
-            setFilteredData(response.data); // Initialize filtered data
+            setDatalist(response.data.data);
         } else {
             notify({ title: "Error!", text: response.data, icon: "error" });
         }
     };
-
+    const handlePageChange = (page) => {
+        if (page > 0 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
     const handleDelete = async (id) => {
         if (window.confirm("Are you sure you want to delete this item?")) {
             try {
@@ -50,29 +45,9 @@ export default function Location() {
         }
     };
 
-    const handleSearch = () => {
-        if (searchTerm.trim() === "") {
-            setFilteredData(datalist);
-        } else {
-            const lowercasedTerm = searchTerm.toLowerCase();
-            const filtered = datalist.filter(
-                (item) =>
-                    item.DESC1.toLowerCase().includes(lowercasedTerm) ||
-                    (item.parentName && item.parentName.toLowerCase().includes(lowercasedTerm))
-            );
-            setFilteredData(filtered);
-        }
-        setCurrentPage(1); // Reset to the first page on new search
-    };
 
-    // Pagination logic
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
         <>
@@ -98,16 +73,6 @@ export default function Location() {
                                             Add New
                                         </Link>
                                     </h5>
-                                    {/* Search Bar */}
-                                    <div className="mb-3">
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            placeholder="Search by location or city"
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                        />
-                                    </div>
                                     {/* Table */}
                                     <table className="table">
                                         <thead>
@@ -119,56 +84,40 @@ export default function Location() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {currentItems && currentItems.length > 0 ? (
-                                                currentItems.map((list, index) => (
-                                                    <tr key={index}>
-                                                        <th scope="row">{indexOfFirstItem + index + 1}</th>
-                                                        <td>{list.DESC1}</td>
-                                                        <td>{list.parentName || "---"}</td>
-                                                        <td>
-                                                            <Link to={`/location/add/${list._id}`}>
-                                                                <i
-                                                                    className="bx bxs-pencil text-primary"
-                                                                    style={{ cursor: "pointer" }}
-                                                                ></i>
-                                                            </Link>
-                                                            &nbsp;
-                                                            <i
-                                                                className="bx bx-trash text-danger"
-                                                                style={{ cursor: "pointer" }}
-                                                                onClick={() => handleDelete(list._id)}
-                                                            ></i>
-                                                            &nbsp;
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            ) : (
-                                                <tr>
-                                                    <td colSpan="4" className="text-center">
-                                                        No data found
+
+                                            {datalist && datalist.length > 0 ? datalist.map((list, index) => (
+                                                <tr key={index}>
+                                                    <th scope="row">{index + 1}</th>
+                                                    <td>{list.DESC1}</td>
+                                                    <td>{list.parentName || '---'}</td>
+                                                    <td>
+                                                        <Link to={`/city/add/${list._id}`}><i className="bx bxs-pencil text-primary" style={{ cursor: "pointer" }}></i></Link>&nbsp;
+                                                        <i className="bx bx-trash text-danger" style={{ cursor: "pointer" }} onClick={() => handleDelete(list._id)}></i>&nbsp;
                                                     </td>
                                                 </tr>
+                                            )) : (
+                                                <tr>
+                                                    <td colSpan="4" className="text-center">No data found</td>
+                                                </tr>
                                             )}
+
                                         </tbody>
                                     </table>
-                                    {/* Pagination */}
-                                    <nav>
-                                        <ul className="pagination justify-content-center">
-                                            {Array.from({ length: totalPages }, (_, index) => (
-                                                <li
-                                                    key={index}
-                                                    className={`page-item ${
-                                                        currentPage === index + 1 ? "active" : ""
-                                                    }`}
-                                                >
-                                                    <button
-                                                        className="page-link"
-                                                        onClick={() => paginate(index + 1)}
-                                                    >
-                                                        {index + 1}
-                                                    </button>
-                                                </li>
-                                            ))}
+                                    <nav aria-label="Page navigation example">
+                                        <ul class="pagination">
+                                            <li class="page-item">
+                                                <button class="page-link" type="button" aria-label="Previous" onClick={() => handlePageChange(currentPage - 1)}
+                                                    disabled={currentPage === 1}>
+                                                    <span aria-hidden="true">«</span>
+                                                </button>
+                                            </li>
+                                            <li class="page-item" style={{ color: "#0a58ca", fontSize: "14px", padding: "9px 10px" }}><span> Page {currentPage} of {totalPages} </span></li>
+                                            <li class="page-item">
+                                                <button class="page-link" type="button" aria-label="Next" onClick={() => handlePageChange(currentPage + 1)}
+                                                    disabled={currentPage === totalPages}>
+                                                    <span aria-hidden="true">»</span>
+                                                </button>
+                                            </li>
                                         </ul>
                                     </nav>
                                 </div>

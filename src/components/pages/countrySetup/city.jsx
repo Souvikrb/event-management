@@ -5,21 +5,22 @@ import { useEffect, useState } from "react";
 import ApiPaths from "../../../api/ApiPaths";
 import useResponse from "../../customHooks/useResponse";
 export default function City() {
-    const { getApiHandler,deleteApiHandler } = useApiHandlers();
+    const { getApiHandler, deleteApiHandler } = useApiHandlers();
     const [datalist, setDatalist] = useState([]);
     const { id } = useParams();
     const { notify } = useResponse()
     const cityId = id || '';
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [loading, setLoading] = useState(false);
     // Fetch countries when the component mounts
-    useEffect(() => {
-            fetchData(); 
-        }, []);
-    const fetchData = async () => {
-        const response = await getApiHandler(`${ApiPaths.master_list}/MASTER_CITY`);
+    useEffect(() => { fetchData(currentPage); }, [currentPage]);
+    const fetchData = async (page) => {
+        const response = await getApiHandler(`${ApiPaths.master_listwithpagination}/MASTER_CITY?page=${page}&limit=3`);
         if (response.status === 200) {
-            setDatalist(response.data);
-        }else{
-            notify({title:"Error!",text:response.data,icon:"error"})
+            setDatalist(response.data.data);
+        } else {
+            notify({ title: "Error!", text: response.data, icon: "error" })
         }
     };
     const handleDelete = async (id) => {
@@ -31,14 +32,19 @@ export default function City() {
                 if (response.status === 200) {
                     // Update the datalist by filtering out the deleted item
                     setDatalist((prevDatalist) => prevDatalist.filter(item => item._id !== id));
-                    notify({title:"Success!",text:response.data,icon:"success"});
+                    notify({ title: "Success!", text: response.data, icon: "success" });
                 } else {
-                    notify({title:"Error!",text:response.data,icon:"error"});
+                    notify({ title: "Error!", text: response.data, icon: "error" });
                 }
             } catch (error) {
                 console.error("Error deleting item:", error);
                 alert("An error occurred while deleting the item.");
             }
+        }
+    };
+    const handlePageChange = (page) => {
+        if (page > 0 && page <= totalPages) {
+            setCurrentPage(page);
         }
     };
     return (
@@ -76,8 +82,8 @@ export default function City() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            
-                                        {datalist && datalist.length > 0 ? datalist.map((list, index) => (
+
+                                            {datalist && datalist.length > 0 ? datalist.map((list, index) => (
                                                 <tr key={index}>
                                                     <th scope="row">{index + 1}</th>
                                                     <td>{list.DESC1}</td>
@@ -95,6 +101,24 @@ export default function City() {
 
                                         </tbody>
                                     </table>
+                                    <nav aria-label="Page navigation example">
+                                        <ul class="pagination">
+                                            <li class="page-item">
+                                                <button class="page-link" type="button" aria-label="Previous" onClick={() => handlePageChange(currentPage - 1)}
+                                                    disabled={currentPage === 1}>
+                                                    <span aria-hidden="true">«</span>
+                                                </button>
+                                            </li>
+                                            <li class="page-item" style={{color: "#0a58ca",fontSize: "14px",padding: "9px 10px"}}><span> Page {currentPage} of {totalPages} </span></li>
+                                            <li class="page-item">
+                                                <button class="page-link" type="button" aria-label="Next" onClick={() => handlePageChange(currentPage + 1)}
+                                                    disabled={currentPage === totalPages}>
+                                                    <span aria-hidden="true">»</span>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </nav>
+
                                     {/* End Horizontal Form */}
                                 </div>
                             </div>

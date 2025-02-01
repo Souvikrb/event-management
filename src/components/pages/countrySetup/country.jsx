@@ -5,17 +5,27 @@ import { useEffect, useState } from "react";
 import ApiPaths from "../../../api/ApiPaths";
 import useResponse from "../../customHooks/useResponse";
 export default function Country() {
-    const { getApiHandler,deleteApiHandler } = useApiHandlers();
+    const { getApiHandler, deleteApiHandler } = useApiHandlers();
     const [datalist, setDatalist] = useState([]);
     const { notify } = useResponse()
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [loading, setLoading] = useState(false);
     // Fetch countries when the component mounts
-    useEffect(() => { fetchData(); }, []);
-    const fetchData = async () => {
-        const response = await getApiHandler(`${ApiPaths.master_list}/MASTER_COUNTRY`);
+    useEffect(() => { fetchData(currentPage); }, [currentPage]);
+    const fetchData = async (page) => {
+        const response = await getApiHandler(`${ApiPaths.master_listwithpagination}/MASTER_COUNTRY?page=${page}&limit=3`);
         if (response.status === 200) {
-            setDatalist(response.data);
+            setDatalist(response.data.data);
+            setCurrentPage(response.data.currentPage);
+            setTotalPages(response.data.totalPages);
         } else {
             notify({ title: "Error!", text: response.data, icon: "error" })
+        }
+    };
+    const handlePageChange = (page) => {
+        if (page > 0 && page <= totalPages) {
+            setCurrentPage(page);
         }
     };
     const handleDelete = async (id) => {
@@ -36,7 +46,7 @@ export default function Country() {
             }
         }
     };
-    
+
     return (
         <>
             <main id="main" className="main">
@@ -71,27 +81,44 @@ export default function Country() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            
-                                        {datalist && datalist.length > 0 ? datalist.map((list, index) => (
-                                            <tr key={index}>
-                                                <th scope="row">{index + 1}</th>
-                                                <td>{list.DESC1}</td>
-                                                <td>
-                                                    <Link to={`/country/add/${list._id}`}><i className="bx bxs-pencil text-primary" style={{ cursor: "pointer" }}></i></Link>&nbsp;
-                                                    <i className="bx bx-trash text-danger" style={{ cursor: "pointer" }} onClick={() => handleDelete(list._id)}></i>&nbsp;
-                                                </td>
-                                            </tr>
-                                        )) : (
-                                            <tr>
-                                                <td colSpan="4" className="text-center">No data found</td>
-                                            </tr>
-                                        )}
+
+                                            {datalist && datalist.length > 0 ? datalist.map((list, index) => (
+                                                <tr key={index}>
+                                                    <th scope="row">{index + 1}</th>
+                                                    <td>{list.DESC1}</td>
+                                                    <td>
+                                                        <Link to={`/country/add/${list._id}`}><i className="bx bxs-pencil text-primary" style={{ cursor: "pointer" }}></i></Link>&nbsp;
+                                                        <i className="bx bx-trash text-danger" style={{ cursor: "pointer" }} onClick={() => handleDelete(list._id)}></i>&nbsp;
+                                                    </td>
+                                                </tr>
+                                            )) : (
+                                                <tr>
+                                                    <td colSpan="4" className="text-center">No data found</td>
+                                                </tr>
+                                            )}
 
 
 
 
                                         </tbody>
                                     </table>
+                                    <nav aria-label="Page navigation example">
+                                        <ul class="pagination">
+                                            <li class="page-item">
+                                                <button class="page-link" type="button" aria-label="Previous" onClick={() => handlePageChange(currentPage - 1)}
+                                                    disabled={currentPage === 1}>
+                                                    <span aria-hidden="true">«</span>
+                                                </button>
+                                            </li>
+                                            <li class="page-item" style={{color: "#0a58ca",fontSize: "14px",padding: "9px 10px"}}><span> Page {currentPage} of {totalPages} </span></li>
+                                            <li class="page-item">
+                                                <button class="page-link" type="button" aria-label="Next" onClick={() => handlePageChange(currentPage + 1)}
+                                                    disabled={currentPage === totalPages}>
+                                                    <span aria-hidden="true">»</span>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </nav>
                                     {/* End Horizontal Form */}
                                 </div>
                             </div>

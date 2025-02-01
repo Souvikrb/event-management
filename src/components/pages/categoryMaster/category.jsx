@@ -8,16 +8,15 @@ export default function Category() {
     const { getApiHandler,deleteApiHandler } = useApiHandlers();
     const [datalist, setDatalist] = useState([]);
     const { notify } = useResponse()
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [loading, setLoading] = useState(false);
     // Fetch data when the component mounts
-    useEffect(() => {
-        
-        fetchData(); 
-    }, []);
-    const fetchData = async () => {
-        const response = await getApiHandler(`${ApiPaths.master_list}/MASTER_CATEGORY`);
-        console.log(response);
+    useEffect(() => { fetchData(currentPage); }, [currentPage]);
+    const fetchData = async (page) => {
+        const response = await getApiHandler(`${ApiPaths.master_listwithpagination}/MASTER_CATEGORY?page=${page}&limit=3`);
         if (response.status === 200) {
-            setDatalist(response.data);
+            setDatalist(response.data.data);
         }else{
             notify({title:"Error!",text:response.data,icon:"error"})
         }
@@ -39,6 +38,11 @@ export default function Category() {
                 console.error("Error deleting item:", error);
                 alert("An error occurred while deleting the item.");
             }
+        }
+    };
+    const handlePageChange = (page) => {
+        if (page > 0 && page <= totalPages) {
+            setCurrentPage(page);
         }
     };
     return (
@@ -95,7 +99,25 @@ export default function Category() {
 
 
                                         </tbody>
+                                        
                                     </table>
+                                    <nav aria-label="Page navigation example">
+                                            <ul class="pagination">
+                                                <li class="page-item">
+                                                    <button class="page-link" type="button" aria-label="Previous" onClick={() => handlePageChange(currentPage - 1)}
+                                                        disabled={currentPage === 1}>
+                                                        <span aria-hidden="true">«</span>
+                                                    </button>
+                                                </li>
+                                                <li class="page-item" style={{color: "#0a58ca",fontSize: "14px",padding: "9px 10px"}}><span> Page {currentPage} of {totalPages} </span></li>
+                                                <li class="page-item">
+                                                    <button class="page-link" type="button" aria-label="Next" onClick={() => handlePageChange(currentPage + 1)}
+                                                        disabled={currentPage === totalPages}>
+                                                        <span aria-hidden="true">»</span>
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                    </nav>
                                     {/* End Horizontal Form */}
                                 </div>
                             </div>

@@ -8,6 +8,21 @@ export default function ServiceProvider() {
     const { getApiHandler, deleteApiHandler,putApiHandler } = useApiHandlers();
     const { notify } = useResponse();
     const [datalist, setDatalist] = useState([]);
+    const [currentPage,setCurrentPage] = useState(1);
+    const [search,setSearch] = useState('');
+    const rowsPerPage = 5;
+    const filteredData = datalist.filter((row) =>
+        Object.values(row).some((value) =>
+            String(value).toLowerCase().includes(search.toLowerCase())
+        )
+    );
+    const indexOfLastRow = currentPage * rowsPerPage;
+    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+    const currentRow = filteredData.slice(indexOfFirstRow,indexOfLastRow);
+    const totalPages = Math.ceil(filteredData.length/rowsPerPage);
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
     useEffect(() => {
         fetchData();
     }, []);
@@ -75,6 +90,13 @@ export default function ServiceProvider() {
                                             Add New
                                         </Link></h5>
                                     {/* Horizontal Form */}
+                                    <input
+                                        type="text"
+                                        placeholder="Search..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        style={{ marginBottom: "10px", padding: "5px", width: "200px" }}
+                                    />
                                     <table className="table">
                                         <thead>
                                             <tr>
@@ -87,7 +109,7 @@ export default function ServiceProvider() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {datalist && datalist.length > 0 ? datalist.map((list, index) => (
+                                            {currentRow && currentRow.length > 0 ? currentRow.map((list, index) => (
                                                 <tr key={index}>
                                                     <th scope="row">{index + 1}</th>
                                                     <td>{list.fullName}</td>
@@ -111,6 +133,24 @@ export default function ServiceProvider() {
                                         </tbody>
                                     </table>
                                     {/* End Horizontal Form */}
+                                    <div style={{ marginTop: "10px" }}>
+                                        {Array.from({ length: totalPages }, (_, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => handlePageChange(index + 1)}
+                                                style={{
+                                                    margin: "0 5px",
+                                                    padding: "5px 10px",
+                                                    backgroundColor: currentPage === index + 1 ? "#007bff" : "#fff",
+                                                    color: currentPage === index + 1 ? "#fff" : "#000",
+                                                    border: "1px solid #007bff",
+                                                    cursor: "pointer",
+                                                }}
+                                            >
+                                                {index + 1}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -25,7 +25,7 @@ export default function Login() {
     const loginSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${ApiPaths.login}/${param}`, formdata, {
+            const response = await axios.post(`${ApiPaths.login}?type=${param}`, formdata, {
               headers: { "Accept": "Application/json"},
             });
             let token = response.data.token;
