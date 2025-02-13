@@ -168,7 +168,7 @@ const AddEditSection = ({ profileId = null, profileData,formData,setFormData,val
                             <option value="">Select provider</option>
                             {provider.map((p) => (
                                 <option key={p._id} value={p._id}>
-                                    {p.fullName}
+                                    {p.name}
                                 </option>
                             ))}
                         </select>
@@ -239,7 +239,7 @@ const AddEditSection = ({ profileId = null, profileData,formData,setFormData,val
                             onChange={handleChange}
                         >
                             <option value="">Select category</option>
-                            { categories.map((category) => (
+                            { Array.isArray(categories) && categories.map((category) => (
                                 <option key={category._id} value={category._id}>
                                     {category.DESC1}
                                 </option>

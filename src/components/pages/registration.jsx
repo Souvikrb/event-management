@@ -7,11 +7,13 @@ import axios from "axios";
 
 const Registration = () => {
     const [formData, setFormData] = useState({
-        fullName: "",
+        name: "",
         phone: "",
         email: "",
         password: "",
         otp: "",
+        role:"serviceprovider",
+        status:"0"
     });
     const [otpSent, setOtpSent] = useState(false);
     const [otpVerified, setOtpVerified] = useState(false);
@@ -76,8 +78,7 @@ const Registration = () => {
             notify({ title: "Error!", text: "Please verify your email OTP before submitting.", icon: "error" });
             return;
         }
-        
-        const response = await postApiHandler(ApiPaths.serviceprovider,formData);
+        const response = await postApiHandler(ApiPaths.register,formData);
         if (response.status == 200 || response.status == 201) {
             navigate(`/login`);
             notify({ title: "Success!", text: response.data, icon: "success" })
@@ -106,14 +107,14 @@ const Registration = () => {
                                         </div>
                                         <form className="row g-3" onSubmit={handleSubmit}>
                                             <div className="col-12">
-                                                <label htmlFor="fullName" className="form-label">
+                                                <label htmlFor="name" className="form-label">
                                                     Full Name
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    name="fullName"
+                                                    name="name"
                                                     className="form-control"
-                                                    id="fullName"
+                                                    id="name"
                                                     required
                                                     onChange={handleInputChange}
                                                 />

@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import useApiHandlers from "../../../../api/ApiHandlers";
 import ApiPaths from "../../../../api/ApiPaths";
-import { Navigate } from "react-router-dom";
 import useResponse from "../../../customHooks/useResponse";
+import { useNavigate } from "react-router-dom";
 const AddProfile = ({profileId = null, profileData}) => {
     const defaultFormValues = {
-        fullName: "",
+        name: "",
         phone: "",
         email: "",
         password:"",
@@ -15,7 +15,8 @@ const AddProfile = ({profileId = null, profileData}) => {
         location: "",
         profileImage: "",
         category: "",
-        status:"active"
+        status:"1",
+        role:"serviceprovider"
     }
     const { postApiHandler,getApiHandler,putApiHandler } = useApiHandlers();
     const [formData, setFormData] = useState(defaultFormValues);
@@ -27,7 +28,7 @@ const AddProfile = ({profileId = null, profileData}) => {
     const [cities, setCities] = useState([]);
     const [locations, setLocations] = useState([]);
     const { notify } = useResponse();
-    
+    const Navigate = useNavigate();
 
     // Handle input change
     const handleChange = (e) => {
@@ -44,9 +45,9 @@ const AddProfile = ({profileId = null, profileData}) => {
     // Validate form
     const validateForm = () => {
         const errors = {};
-        if (!formData.fullName.trim()) errors.fullName = "Full Name is required";
+        if (!formData.name.trim()) errors.name = "Full Name is required";
         if (!formData.phone) errors.phone = "Phone is required";
-        //if (!formData.password) errors.password = "Password is required";
+        if (!formData.password) errors.password = "Password is required";
         if (!formData.email.trim()) {
             errors.email = "Email is required";
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -136,7 +137,7 @@ const AddProfile = ({profileId = null, profileData}) => {
         }
         
         if (response.status == 200 || response.status == 201) {
-            //Navigate(`/serviceprovider/`);
+            Navigate(`/serviceprovider/`);
             notify({ title: "Success!", text: response.data, icon: "success" })
         } else {
             notify({ title: "Error!", text: response.data, icon: "error" })
@@ -178,19 +179,19 @@ const AddProfile = ({profileId = null, profileData}) => {
                         </div>
                     </div>
                     <div className="row mb-3">
-                        <label htmlFor="fullName" className="col-md-4 col-lg-3 col-form-label">
+                        <label htmlFor="name" className="col-md-4 col-lg-3 col-form-label">
                             Full Name
                         </label>
                         <div className="col-md-8 col-lg-9">
                             <input
-                                name="fullName"
+                                name="name"
                                 type="text"
-                                className={`form-control ${errors.fullName ? "is-invalid" : ""}`}
-                                id="fullName"
-                                value={formData.fullName}
+                                className={`form-control ${errors.name ? "is-invalid" : ""}`}
+                                id="name"
+                                value={formData.name}
                                 onChange={handleChange}
                             />
-                            {errors.fullName && <div className="invalid-feedback">{errors.fullName}</div>}
+                            {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                         </div>
                     </div>
                     <div className="row mb-3">
@@ -225,7 +226,7 @@ const AddProfile = ({profileId = null, profileData}) => {
                             {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                         </div>
                     </div>
-                    {/* <div className="row mb-3">
+                    <div className="row mb-3">
                         <label htmlFor="Password" className="col-md-4 col-lg-3 col-form-label">
                             Password
                         </label>
@@ -240,7 +241,7 @@ const AddProfile = ({profileId = null, profileData}) => {
                             />
                             {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                         </div>
-                    </div> */}
+                    </div>
                     <div className="row mb-3">
                         <label htmlFor="about" className="col-md-4 col-lg-3 col-form-label">
                             About
@@ -270,7 +271,7 @@ const AddProfile = ({profileId = null, profileData}) => {
                                 onChange={handleChange}
                             >
                                 <option value="">Select category</option>
-                                {categories.map((category) => (
+                                {categories && categories.map((category) => (
                                     <option key={category._id} value={category._id}>
                                         {category.DESC1}
                                     </option>

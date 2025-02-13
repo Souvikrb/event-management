@@ -2,7 +2,7 @@
 export default class ApiPaths {
     static site_url         = "http://localhost:5001";
     static login            = this.site_url+"/api/login";
-    static register         = this.site_url+"api/register";
+    static register         = this.site_url+"/api/register";
     static emailOtpSend     = this.site_url+"/api/sendEmailOTP";
     static emailOtpverify   = this.site_url+"/api/verifyEmailOTP";
 

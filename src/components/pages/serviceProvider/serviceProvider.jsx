@@ -55,7 +55,7 @@ export default function ServiceProvider() {
         }
     };
     const approveHandler = async (id,currentStatus) => {
-       const updateStatus = (currentStatus == 'active')?'inactive':'active';
+       const updateStatus = (currentStatus == '1')?'0':'1';
        const data = {status:updateStatus}
        const response = await putApiHandler(`${ApiPaths.serviceproviderApprove}/${id}`,data);
        if(response.status == 200){
@@ -112,11 +112,11 @@ export default function ServiceProvider() {
                                             {currentRow && currentRow.length > 0 ? currentRow.map((list, index) => (
                                                 <tr key={index}>
                                                     <th scope="row">{index + 1}</th>
-                                                    <td>{list.fullName}</td>
+                                                    <td>{list.name}</td>
                                                     <td>{list.phone}</td>
                                                     <td>{list.email}</td>
                                                     <td><div class="form-check form-switch">
-                                                            <input class="form-check-input" type="checkbox" id={`flexSwitchCheckChecked${index}`} onChange={e =>approveHandler(list._id,list.status)} checked={list.status == 'active' && 'checked'} />
+                                                            <input class="form-check-input" type="checkbox" id={`flexSwitchCheckChecked${index}`} onChange={e =>approveHandler(list._id,list.status)} checked={list.status == '1' && 'checked'} />
                                                         </div>
                                                     </td>
                                                     <td>
